@@ -1,4 +1,4 @@
-module csvmanager
+module github.com/arewabolu/csvmanager
 
 go 1.19
 
