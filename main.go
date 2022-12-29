@@ -33,22 +33,21 @@ func NewFrame(headers []string, data [][]string) *Frame {
 	}
 }
 
-func Float(f Frame) []float64 {
-	nwDataFLoat := make([]float64, len(f.Data))
-	for _, v := range f.Data {
-		for _, vv := range v {
-			strType := reflect.TypeOf(vv)
-			floatType := reflect.TypeOf(float64(0))
+func Float(strSlice []string) []float64 {
+	nwDataFLoat := make([]float64, 0, len(strSlice))
+	for _, v := range strSlice {
+		strType := reflect.TypeOf(v)
+		floatType := reflect.TypeOf(float64(0))
 
-			// Check if the string type is convertible to the float64 type
-			if strType.ConvertibleTo(floatType) {
-				val, err := strconv.ParseFloat(vv, 64)
-				if err != nil {
-					panic(fmt.Sprintf("%v cannot convert to float64: %v", vv, err))
-				}
-				nwDataFLoat = append(nwDataFLoat, val)
+		// Check if the string type is convertible to the float64 type
+		if strType.ConvertibleTo(floatType) {
+			val, err := strconv.ParseFloat(v, 64)
+			if err != nil {
+				panic(fmt.Sprintf("%v cannot convert to float64: %v", v, err))
 			}
+			nwDataFLoat = append(nwDataFLoat, val)
 		}
+
 	}
 	return nwDataFLoat
 }
