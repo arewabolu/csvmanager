@@ -5,14 +5,56 @@ import (
 	"encoding/csv"
 	"fmt"
 	"os"
+	"reflect"
+	"strconv"
 
 	"golang.org/x/exp/slices"
 )
+
+type Types interface {
+	Float() []float64
+	Int() []int
+	Bool() []bool
+}
 
 type Frame struct {
 	Headers []string
 	Data    [][]string
 }
+
+type Column struct {
+	Name string
+}
+
+func NewFrame(headers []string, data [][]string) *Frame {
+	return &Frame{
+		Headers: headers,
+		Data:    data,
+	}
+}
+
+func Float(f Frame) []float64 {
+	nwDataFLoat := make([]float64, len(f.Data))
+	for _, v := range f.Data {
+		for _, vv := range v {
+			strType := reflect.TypeOf(vv)
+			floatType := reflect.TypeOf(float64(0))
+
+			// Check if the string type is convertible to the float64 type
+			if strType.ConvertibleTo(floatType) {
+				val, err := strconv.ParseFloat(vv, 64)
+				if err != nil {
+					panic(fmt.Sprintf("%v cannot convert to float64: %v", vv, err))
+				}
+				nwDataFLoat = append(nwDataFLoat, val)
+			}
+		}
+	}
+	return nwDataFLoat
+}
+
+//func (f *Frame) Int() []int   {}
+//func (f *Frame) Bool() []bool {}
 
 func ReadCsv(filePath string, bufSize ...int) (Frame, error) {
 	file, err := os.Open(filePath)
