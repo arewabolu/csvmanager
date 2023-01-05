@@ -7,9 +7,9 @@ import (
 
 func TestColumn(t *testing.T) {
 	rds, _ := ReadCsv("./BTCUSDT-1h-2022-11.csv", 200)
-	col := rds.Column("high")
+	col := rds.Col("high")
 
-	if col[0] != "204192.10" {
+	if col[0] != "20492.10" {
 		fmt.Println(col)
 		t.Error("not the same column data")
 	}
@@ -33,5 +33,21 @@ func TestRows(t *testing.T) {
 	if nwRow[4] != expected[4] {
 		fmt.Println(nwRow[0])
 		t.Error("wrong row data")
+	}
+}
+
+func TestFloat(t *testing.T) {
+	rds, _ := ReadCsv("./BTCUSDT-1h-2022-11.csv")
+	Column := Float(rds.Col("open"))
+
+	if len(Column) == 0 {
+		fmt.Println(Column[:5])
+		t.Error("no columns returned")
+		return
+	}
+	if Column[0] == 1231 {
+
+		t.Error("unexpected column")
+
 	}
 }

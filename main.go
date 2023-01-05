@@ -5,7 +5,6 @@ import (
 	"encoding/csv"
 	"fmt"
 	"os"
-	"reflect"
 	"strconv"
 
 	"golang.org/x/exp/slices"
@@ -17,37 +16,32 @@ type Types interface {
 	Bool() []bool
 }
 
+type RowList struct {
+	RowData []string
+}
+
+type ColList struct {
+	Header  string
+	ColData []string
+}
+
 type Frame struct {
 	Headers []string
 	Data    [][]string
 }
 
-type Column struct {
-	Name string
-}
-
 func NewFrame(headers []string, data [][]string) *Frame {
-	return &Frame{
-		Headers: headers,
-		Data:    data,
-	}
+	return &Frame{}
 }
 
-func Float(strSlice []string) []float64 {
-	nwDataFLoat := make([]float64, 0, len(strSlice))
-	for _, v := range strSlice {
-		strType := reflect.TypeOf(v)
-		floatType := reflect.TypeOf(float64(0))
-
-		// Check if the string type is convertible to the float64 type
-		if strType.ConvertibleTo(floatType) {
-			val, err := strconv.ParseFloat(v, 64)
-			if err != nil {
-				panic(fmt.Sprintf("%v cannot convert to float64: %v", v, err))
-			}
-			nwDataFLoat = append(nwDataFLoat, val)
+func Float(record []string) []float64 {
+	nwDataFLoat := make([]float64, 0, len(record))
+	for _, v := range record {
+		val, err := strconv.ParseFloat(v, 64)
+		if err != nil {
+			panic(fmt.Sprintf("%v cannot convert to float64: %v", v, err))
 		}
-
+		nwDataFLoat = append(nwDataFLoat, val)
 	}
 	return nwDataFLoat
 }
@@ -73,20 +67,18 @@ func ReadCsv(filePath string, bufSize ...int) (Frame, error) {
 
 	records, err := rd.ReadAll()
 	if err != nil {
-		fmt.Println(err)
+		return Frame{}, err
 	}
-
-	//fmt.Println(records[0])
-
 	f := Frame{
 		Headers: records[0],
 		Data:    records[1:],
 	}
 
 	return f, nil
+
 }
 
-func (f Frame) Column(colName string) []string {
+func (f Frame) Col(colName string) []string {
 	if !slices.Contains(f.Headers, colName) {
 		panic("column not found in records")
 	}
@@ -109,7 +101,6 @@ func (f Frame) Column(colName string) []string {
 //
 // Only 0,2, or 3 values can be specified.
 func (f Frame) Rows(Range ...int) [][]string {
-
 	if len(Range) == 0 {
 		return f.Data
 	}
