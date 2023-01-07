@@ -1,10 +1,10 @@
 package csvmanager
 
 import (
-	"fmt"
 	"testing"
 )
 
+/*
 func TestColumn(t *testing.T) {
 	rds, _ := ReadCsv("./BTCUSDT-1h-2022-11.csv", 200)
 	col := rds.Col("high")
@@ -34,19 +34,16 @@ func TestRows(t *testing.T) {
 		fmt.Println(nwRow[0])
 		t.Error("wrong row data")
 	}
-}
+}*/
 
 func TestFloat(t *testing.T) {
 	rds, _ := ReadCsv("./BTCUSDT-1h-2022-11.csv")
-	Column := Float(rds.Col("open"))
+	Column := rds.Col("test").Float()
 
 	if len(Column) == 0 {
-		fmt.Println(Column[:5])
 		t.Error("no columns returned")
-		return
 	}
-	if Column[0] == 1231 {
-
+	if Column[0] != 1231 {
 		t.Error("unexpected column")
 
 	}

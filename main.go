@@ -6,8 +6,6 @@ import (
 	"fmt"
 	"os"
 	"strconv"
-
-	"golang.org/x/exp/slices"
 )
 
 type Types interface {
@@ -17,26 +15,22 @@ type Types interface {
 }
 
 type RowList struct {
-	RowData []string
+	rowData []string
 }
 
 type ColList struct {
-	Header  string
-	ColData []string
+	header  string
+	colData []string
 }
 
 type Frame struct {
-	Headers []string
-	Data    [][]string
+	Cols []ColList
+	Rws  []RowList
 }
 
-func NewFrame(headers []string, data [][]string) *Frame {
-	return &Frame{}
-}
-
-func Float(record []string) []float64 {
-	nwDataFLoat := make([]float64, 0, len(record))
-	for _, v := range record {
+func (c ColList) Float() []float64 {
+	nwDataFLoat := make([]float64, 0, len(c.colData))
+	for _, v := range c.colData {
 		val, err := strconv.ParseFloat(v, 64)
 		if err != nil {
 			panic(fmt.Sprintf("%v cannot convert to float64: %v", v, err))
@@ -56,8 +50,7 @@ func ReadCsv(filePath string, bufSize ...int) (Frame, error) {
 	}
 	defer file.Close()
 
-	rd := new(csv.Reader)
-
+	var rd *csv.Reader
 	if len(bufSize) > 0 {
 		rdder := bufio.NewReaderSize(file, bufSize[0])
 		rd = csv.NewReader(rdder)
@@ -70,28 +63,26 @@ func ReadCsv(filePath string, bufSize ...int) (Frame, error) {
 		return Frame{}, err
 	}
 	f := Frame{
-		Headers: records[0],
-		Data:    records[1:],
+		Cols: genCols(records),
 	}
 
 	return f, nil
 
 }
 
-func (f Frame) Col(colName string) []string {
-	if !slices.Contains(f.Headers, colName) {
-		panic("column not found in records")
-	}
-	colData := make([]string, 0, len(f.Data))
-	colIndex := slices.Index(f.Headers, colName)
-	if colIndex == -1 {
-		panic("column not found in records")
-	}
+func (f Frame) Col(colName string) ColList {
+	//if colIndex == -1 {
+	//	panic("column not found in records")
+	//}
 
-	for _, record := range f.Data {
-		colData = append(colData, record[colIndex])
+	//colData := make([]string, 0, len(c.colData))
+	for _, record := range f.Cols {
+		if colName == record.header {
+			return record
+		}
+		//colData = append(colData, record[colIndex])
 	}
-	return colData
+	return ColList{}
 }
 
 // Row returns the rows specified by Range.
@@ -100,7 +91,7 @@ func (f Frame) Col(colName string) []string {
 // else it returns All rows exluding the Header.
 //
 // Only 0,2, or 3 values can be specified.
-func (f Frame) Rows(Range ...int) [][]string {
+/*func (f Frame) Rows(Range ...int) [][]string {
 	if len(Range) == 0 {
 		return f.Data
 	}
@@ -140,7 +131,7 @@ func (f Frame) Row(rowLine int) []string {
 func (f Frame) RowLength() int {
 	return len(f.Headers)
 }
-
+*/
 func (f Frame) ColumnLenght() int {
-	return len(f.Data)
+	return len(f.Cols)
 }
