@@ -124,52 +124,6 @@ func (r RowList) Int() []int {
 	return nwDataInt
 }
 
-/*
-func (r RowList) Interface(v interface{}) {
-
-		expStruct := reflect.ValueOf(v).Elem()
-		expStructType := expStruct.Type()
-
-		for i := 0; i < expStruct.NumField(); i++ {
-			field := expStruct.Field(i)
-			fieldVal := expStruct.Field(i)
-			fieldType := field.Type
-			fieldKind := fieldVal.Kind()
-
-			// skip hidden fields
-			if field.PkgPath != "" {
-				continue
-			}
-
-			// get query parameter name
-			key := field.Tag.Get("key")
-			if key == "" {
-				key = strings.ToLower(field.Name)
-			}
-
-			// for fields with default values
-			def := field.Tag.Get("default")
-
-			rawValue, ok := query[key]
-			if !ok {
-				if def == "" {
-					fieldVal.Set(reflect.Zero(fieldType))
-					continue
-				} else {
-					rawValue = def
-				}
-			}
-			nwDataBool := make([]bool, 0, len(r.rowData))
-			for _, v := range r.rowData {
-				val, err := strconv.ParseBool(v)
-				if err != nil {
-					panic(fmt.Sprintf("%v cannot convert to float64: %v", v, err))
-				}
-				nwDataBool = append(nwDataBool, val)
-			}
-		}
-	}
-*/
 func ReadCsv(filePath string, bufSize ...int) (Frame, error) {
 	file, err := os.Open(filePath)
 	if err != nil {
