@@ -23,7 +23,7 @@ func genCols(records [][]string) []ColList {
 
 func genRows(records [][]string) []RowList {
 	var rowlist []RowList
-	for _, record := range records {
+	for _, record := range records[1:] {
 		rowlist = append(rowlist, RowList{rowData: record})
 	}
 	return rowlist
