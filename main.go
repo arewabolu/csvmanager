@@ -161,8 +161,8 @@ func (f Frame) Row(rowLine int) RowList {
 
 // Row returns the rows specified by Range.
 //
-// Range should be endtered in order: start,counter,end,
-// else it returns All rows exluding the Header.
+// Range should be endtered in order: start,counter,end(min,range,max),
+// else it returns all rows exluding the Header.
 //
 // Only 0,2, or 3 values can be specified.
 func (f Frame) Rows(Range ...int) []RowList {
@@ -183,7 +183,7 @@ func (f Frame) Rows(Range ...int) []RowList {
 	}
 	if len(Range) == 3 {
 		Length := make([]RowList, 0)
-		for i := Range[0]; i < len(f.Rws); i += Range[1] {
+		for i := Range[0]; i <= Range[2]; i += Range[1] {
 			Length = append(Length, f.Rws[i])
 		}
 		return Length

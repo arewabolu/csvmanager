@@ -1,10 +1,21 @@
 package csvmanager
 
 import (
-	"fmt"
 	"testing"
 )
 
+func TestFloat(t *testing.T) {
+	rds, _ := ReadCsv("./BTCUSDT-1h-2022-11.csv")
+	Column := rds.Col("test").Float()
+
+	if len(Column) == 0 {
+		t.Error("no columns returned")
+	}
+	if Column[0] != 1231 {
+		t.Error("unexpected column")
+
+	}
+}
 func TestColumn(t *testing.T) {
 	rds, _ := ReadCsv("./BTCUSDT-1h-2022-11.csv", 200)
 	col := rds.Col("high").Float()
@@ -17,33 +28,19 @@ func TestColumn(t *testing.T) {
 
 func TestRow(t *testing.T) {
 	rds, _ := ReadCsv("./BTCUSDT-1h-2022-11.csv")
-	row := rds.Row(0).Float()
+	row := rds.Row(1).Float()
 
 	if row[1] != 20445.50 {
-		fmt.Println(row[1])
 		t.Error("wrong row data")
 	}
 }
 
 func TestRows(t *testing.T) {
 	rds, _ := ReadCsv("./BTCUSDT-1h-2022-11.csv")
-	rows := rds.Rows(1, 2, rds.SizeofRows())
+	rows := rds.Rows(1, 2, 6)
 	nwRow := rows[1].Float()
-	expected := []float64{1667264400000, 20548.50, 20445.40, 20502.00, 11047.159, 1667267999999, 226531027.34130, 74358, 5874.933, 120471227.79020, 0}
+	expected := []float64{1667271600000, 20568.10, 20577.00, 20464.60, 20471.30, 11101.117, 1667275199999, 227631088.55590, 74440, 4800.732, 98433200.32610, 0}
 	if nwRow[4] != expected[4] {
 		t.Error("wrong row data")
-	}
-}
-
-func TestFloat(t *testing.T) {
-	rds, _ := ReadCsv("./BTCUSDT-1h-2022-11.csv")
-	Column := rds.Col("test").Float()
-
-	if len(Column) == 0 {
-		t.Error("no columns returned")
-	}
-	if Column[0] != 1231 {
-		t.Error("unexpected column")
-
 	}
 }
