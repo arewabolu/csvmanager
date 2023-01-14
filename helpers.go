@@ -1,6 +1,16 @@
 package csvmanager
 
-import "golang.org/x/exp/slices"
+import (
+	"reflect"
+	"strings"
+
+	"golang.org/x/exp/slices"
+)
+
+type rTesting struct {
+	One int    `json:"one"`
+	Two string `json:"two"`
+}
 
 func newCol(header string, records [][]string) []string {
 	colIndex := slices.Index(records[0], header)
@@ -27,4 +37,20 @@ func genRows(records [][]string) []RowList {
 		rowlist = append(rowlist, RowList{rowData: record})
 	}
 	return rowlist
+}
+
+func jsonNew(v interface{}) {
+	vVal := reflect.ValueOf(v).Elem()
+	vValType := vVal.Type()
+	for i := 0; i < vVal.NumField(); i++ {
+		field := vValType.Field(i)
+		fieldType := field.Type
+		key, _ := field.Tag.Lookup(field.Name)
+		if key == "" {
+			key = strings.ToLower(field.Name)
+		}
+		switch fieldType.Kind() {
+		case reflect.Int:
+		}
+	}
 }

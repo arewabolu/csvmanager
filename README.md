@@ -1,0 +1,1 @@
+A simple go module used to read Csv files only
