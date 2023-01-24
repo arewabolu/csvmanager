@@ -3,9 +3,12 @@ package csvmanager
 import (
 	"bufio"
 	"encoding/csv"
+	"errors"
 	"fmt"
 	"os"
 	"strconv"
+
+	gohaskell "github.com/arewabolu/GoHaskell"
 )
 
 type ColList struct {
@@ -19,6 +22,7 @@ type RowList struct {
 type Frame struct {
 	Cols []ColList
 	Rws  []RowList
+	Err  error
 }
 
 type Types interface {
@@ -26,6 +30,10 @@ type Types interface {
 	Int() []int
 	Bool() []bool
 	Interface(v interface{})
+}
+
+type Error interface {
+	Err() error
 }
 
 // Bool returns an array of boolean values
@@ -198,6 +206,65 @@ func (r RowList) RowsLength() int {
 	return len(r.rowData)
 }
 
+// returns the number of rows in the read file
 func (f Frame) SizeofRows() int {
 	return len(f.Rws)
+}
+
+// Create a new csv file.
+func WriteNewCSV(filePath string, rowData []string) Frame {
+	file, err := os.OpenFile(filePath, os.O_CREATE, 0700)
+	if err != nil {
+		return Frame{Err: err}
+	}
+
+	defer file.Close()
+
+	wr := csv.NewWriter(file)
+	defer wr.Flush()
+
+	wr.Write(rowData)
+	//	for _, i := range entry {
+	//		fV := strconv.FormatFloat(i, 'f', 2, 64)
+	//		err := wr.Write([]string{fV})
+	//		if err != nil {
+	//			panic(err)
+	//}
+	//	}
+	return Frame{Err: nil}
+}
+
+// ReplaceRow is used to edit an existing row in a csv file.
+//
+// It does not create a new file, it only updates the existing file with the edited row.
+func ReplaceRow(filePath string, pos int, nwData []string) Frame {
+	file, err := os.OpenFile(filePath, os.O_RDWR, 0700)
+	if err != nil {
+		return Frame{Err: err}
+	}
+	defer file.Close()
+	rdder := csv.NewReader(file)
+	rdRecords, err := rdder.ReadAll()
+	if err != nil {
+		return Frame{Err: err}
+	}
+	if pos >= len(rdRecords) || pos < 0 {
+		return Frame{Err: errors.New("replacing nonexistent row is not supported")}
+	}
+
+	nwRecords := gohaskell.Pop(rdRecords, pos)
+	nwRecords = gohaskell.Put(nwRecords, nwData, pos)
+	nwFile, err := os.Create(filePath)
+	if err != nil {
+		return Frame{Err: errors.New("could not overrite existing file")}
+	}
+
+	wr := csv.NewWriter(nwFile)
+	defer wr.Flush()
+
+	for _, rec := range nwRecords {
+		wr.Write(rec)
+	}
+
+	return Frame{Err: nil}
 }

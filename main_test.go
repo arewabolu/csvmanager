@@ -44,3 +44,13 @@ func TestRows(t *testing.T) {
 		t.Error("wrong row data")
 	}
 }
+
+func TestReplaceRow(t *testing.T) {
+	rep := ReplaceRow("./test.csv", 1, []string{"x", "e", "x"})
+
+	if rep.Err != nil {
+		t.Error(rep.Err)
+	} else {
+		return
+	}
+}
