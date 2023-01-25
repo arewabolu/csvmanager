@@ -9,6 +9,7 @@ import (
 	"strconv"
 
 	gohaskell "github.com/arewabolu/GoHaskell"
+	"golang.org/x/exp/slices"
 )
 
 type ColList struct {
@@ -20,9 +21,10 @@ type RowList struct {
 }
 
 type Frame struct {
-	Cols []ColList
-	Rws  []RowList
-	Err  error
+	Headers []string
+	Cols    []ColList
+	Rws     []RowList
+	Err     error
 }
 
 type Types interface {
@@ -74,6 +76,17 @@ func (f Frame) Col(colName string) ColList {
 
 func (f Frame) ColLength() int {
 	return len(f.Cols)
+}
+
+// Check if a header exists in the frame
+// returns and error if false otherwise
+// it returns the headers position in the slice
+func (f Frame) CheckHeader(header string) (int, error) {
+	pos, ok := slices.BinarySearch(f.Headers, header)
+	if !ok {
+		return -1, errors.New("header not found")
+	}
+	return pos, nil
 }
 
 // FLoat always returns a float64 type
@@ -132,6 +145,11 @@ func (r RowList) Int() []int {
 	return nwDataInt
 }
 
+// List all headers in the given frame
+func (f Frame) ListHeaders() []string {
+	return f.Headers
+}
+
 func ReadCsv(filePath string, bufSize ...int) (Frame, error) {
 	file, err := os.Open(filePath)
 	if err != nil {
@@ -152,8 +170,9 @@ func ReadCsv(filePath string, bufSize ...int) (Frame, error) {
 		return Frame{}, err
 	}
 	f := Frame{
-		Cols: genCols(records),
-		Rws:  genRows(records),
+		Headers: records[0],
+		Cols:    genCols(records),
+		Rws:     genRows(records),
 	}
 	return f, nil
 }
