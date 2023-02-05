@@ -31,6 +31,7 @@ type Types interface {
 	Float() []float64
 	Int() []int
 	Bool() []bool
+	String() []string
 	Interface(v interface{})
 }
 
@@ -221,6 +222,7 @@ func (f Frame) Rows(Range ...int) []RowList {
 	return nil
 }
 
+// returns the number of rows
 func (r RowList) RowsLength() int {
 	return len(r.rowData)
 }
@@ -228,6 +230,20 @@ func (r RowList) RowsLength() int {
 // returns the number of rows in the read file
 func (f Frame) SizeofRows() int {
 	return len(f.Rws)
+}
+
+// String returns an array of string values for given column
+func (c ColList) String() []string {
+	nwDataString := make([]string, 0, len(c.colData))
+	nwDataString = append(nwDataString, c.colData...)
+	return nwDataString
+}
+
+// String returns an array of string values for given row(s)
+func (r RowList) String() []string {
+	nwDataString := make([]string, 0, len(r.rowData))
+	nwDataString = append(nwDataString, r.rowData...)
+	return nwDataString
 }
 
 // Create a new csv file.
