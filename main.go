@@ -39,9 +39,8 @@ type Types interface {
 
 func (r RowList) Interface(v interface{}) error {
 	result := reflect.ValueOf(v).Elem() //
-
 	if result.Kind() != reflect.Struct {
-		return errors.New("need struct. v is not a struct")
+		return errors.New("need struct, v is not a struct")
 	}
 	resultType := result.Type()
 
@@ -70,7 +69,6 @@ func (r RowList) Interface(v interface{}) error {
 			// get the underlying type of the pointer
 			fieldType = fieldType.Elem()
 			fieldKind = fieldType.Kind()
-
 			// create new pointer to hold the value
 			ptr = reflect.New(fieldType)
 		}
@@ -157,13 +155,6 @@ func (r RowList) Interface(v interface{}) error {
 			}
 		case reflect.String:
 			out = r.rowData[pos]
-			/*
-				case reflect.Struct:
-					// attempt to parse a date value
-					if out, err = ParseISO(rawValue); err != nil {
-						return errors.New("this function doesn't support " + fieldType +"for the field '%s'"+ field.Name)
-					}
-			*/
 		default:
 			return errors.New("this function doesn't support convertion" + "for the field '%s'" + field.Name)
 		}

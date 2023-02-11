@@ -1,7 +1,6 @@
 package csvmanager
 
 import (
-	"fmt"
 	"testing"
 )
 
@@ -59,15 +58,24 @@ func TestReplaceRow(t *testing.T) {
 func TestInterface(t *testing.T) {
 	type RwStr struct {
 		One   int
-		Two   float64 `position:5` // cannot test tags
+		Two   float64 `position:"5"` // testing tags
 		Three float64
 	}
-	decRwStr := &RwStr{}
+	decRwStr := RwStr{}
 	rds, _ := ReadCsv("./BTCUSDT-1h-2022-11.csv")
-	err := rds.Row(2).Interface(decRwStr)
-	if decRwStr.One != 9 {
-		fmt.Println(decRwStr)
+	err := rds.Row(2).Interface(&decRwStr)
+
+	if decRwStr.One != 1667268000000 {
 		t.Error(err)
 	}
 
+}
+
+func TestInterface2(t *testing.T) {
+	var nwtr interface{}
+	rds, _ := ReadCsv("./BTCUSDT-1h-2022-11.csv")
+	err := rds.Row(2).Interface(&nwtr)
+	if err != nil {
+		t.Error(err)
+	}
 }
