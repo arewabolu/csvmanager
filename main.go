@@ -63,7 +63,6 @@ func (r RowList) Interface(v interface{}) error {
 		if err != nil || key == "" {
 			pos = i
 		}
-		fmt.Println(key, "is here")
 
 		// make sure we're not using a pointer
 		var ptr reflect.Value
