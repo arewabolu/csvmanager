@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"reflect"
 	"strconv"
 
 	gohaskell "github.com/arewabolu/GoHaskell"
@@ -16,6 +17,7 @@ type ColList struct {
 	header  string
 	colData []string
 }
+
 type RowList struct {
 	rowData []string
 }
@@ -32,11 +34,152 @@ type Types interface {
 	Int() []int
 	Bool() []bool
 	String() []string
-	Interface(v interface{})
+	Interface(v interface{}) error
 }
 
-type Error interface {
-	Err() error
+func (r RowList) Interface(v interface{}) error {
+	result := reflect.ValueOf(v).Elem() //
+
+	if result.Kind() != reflect.Struct {
+		return errors.New("need struct. v is not a struct")
+	}
+	resultType := result.Type()
+
+	for i := 0; i < result.NumField(); i++ {
+		field := resultType.Field(i) //fields type
+		fieldVal := result.Field(i)  // fields value
+		fieldType := field.Type
+		fieldKind := fieldVal.Kind()
+
+		// skip hidden fields
+		if field.PkgPath != "" {
+			continue
+		}
+
+		// get sructs field tpe
+		// get query parameter name
+		key := field.Tag.Get("position")
+		pos, err := strconv.Atoi(key)
+		if err != nil || key == "" {
+			pos = i
+		}
+		fmt.Println(key, "is here")
+
+		// make sure we're not using a pointer
+		var ptr reflect.Value
+		if fieldKind == reflect.Ptr {
+			// get the underlying type of the pointer
+			fieldType = fieldType.Elem()
+			fieldKind = fieldType.Kind()
+
+			// create new pointer to hold the value
+			ptr = reflect.New(fieldType)
+		}
+
+		if !fieldVal.CanSet() {
+			return errors.New("cannot set field " + field.Name)
+		}
+
+		var out interface{}
+
+		switch fieldKind {
+		case reflect.Bool:
+			out, err = strconv.ParseBool(r.rowData[pos])
+			if err != nil {
+				return errors.New("failed to parse bool" + field.Name)
+			}
+		case reflect.Int:
+			i, err := strconv.ParseInt(r.rowData[pos], 10, fieldType.Bits())
+			if err != nil {
+				return errors.New("failed to parse int" + field.Name)
+			}
+			out = int(i)
+		case reflect.Int8:
+			i, err := strconv.ParseInt(r.rowData[pos], 10, 8)
+			if err != nil {
+				return errors.New("failed to parse int8" + field.Name)
+			}
+			out = int8(i)
+		case reflect.Int16:
+			i, err := strconv.ParseInt(r.rowData[pos], 10, 16)
+			if err != nil {
+				return errors.New("failed to parse int16" + field.Name)
+			}
+			out = int16(i)
+		case reflect.Int32:
+			i, err := strconv.ParseInt(r.rowData[pos], 10, 32)
+			if err != nil {
+				return errors.New("failed to parse int32" + field.Name)
+			}
+			out = int32(i)
+		case reflect.Int64:
+			if out, err = strconv.ParseInt(r.rowData[pos], 10, 64); err != nil {
+				return errors.New("failed to parse int64" + field.Name)
+			}
+		case reflect.Uint:
+			u, err := strconv.ParseUint(r.rowData[pos], 10, fieldType.Bits())
+			if err != nil {
+				return errors.New("failed to parse uint" + field.Name)
+			}
+			out = uint(u)
+		case reflect.Uint8:
+			u, err := strconv.ParseUint(r.rowData[pos], 10, 8)
+			if err != nil {
+				return errors.New("failed to parse uint8" + field.Name)
+			}
+			out = uint8(u)
+		case reflect.Uint16:
+			u, err := strconv.ParseUint(r.rowData[pos], 10, 16)
+			if err != nil {
+				return errors.New("failed to parse uint16" + field.Name)
+			}
+			out = uint16(u)
+		case reflect.Uint32:
+			u, err := strconv.ParseUint(r.rowData[pos], 10, 32)
+			if err != nil {
+				return errors.New("failed to parse uint32" + field.Name)
+			}
+			out = uint32(u)
+		case reflect.Uint64:
+			if out, err = strconv.ParseUint(r.rowData[pos], 10, 64); err != nil {
+				return errors.New("failed to parse uint64" + field.Name)
+			}
+			//result float points 2/3/4/5/6/7?
+		case reflect.Float32:
+			f, err := strconv.ParseFloat(r.rowData[pos], fieldType.Bits())
+			if err != nil {
+				return errors.New("failed to parse float32" + field.Name)
+			}
+			out = float32(f)
+		case reflect.Float64:
+			out, err = strconv.ParseFloat(r.rowData[pos], fieldType.Bits())
+			if err != nil {
+				return errors.New("failed to parse float64" + field.Name)
+			}
+		case reflect.String:
+			out = r.rowData[pos]
+			/*
+				case reflect.Struct:
+					// attempt to parse a date value
+					if out, err = ParseISO(rawValue); err != nil {
+						return errors.New("this function doesn't support " + fieldType +"for the field '%s'"+ field.Name)
+					}
+			*/
+		default:
+			return errors.New("this function doesn't support convertion" + "for the field '%s'" + field.Name)
+		}
+
+		// if original kind is pointer, save as pointer value
+		if fieldVal.Kind() == reflect.Ptr {
+			// set value pointer is pointing to
+			reflect.Indirect(ptr).Set(reflect.ValueOf(out))
+			fieldVal.Set(ptr)
+		} else {
+			fieldVal.Set(reflect.ValueOf(out))
+		}
+	}
+
+	return nil
 }
 
 // Bool returns an array of boolean values
