@@ -17,19 +17,19 @@ func newCol(header string, records [][]string) []string {
 	return colData
 }
 
-func genCols(records [][]string) []ColList {
-	var colist []ColList
+func genCols(records [][]string) []colList {
+	var colist []colList
 	for _, header := range records[0] {
 		colData := newCol(header, records)
-		colist = append(colist, ColList{header: header, colData: colData})
+		colist = append(colist, colList{header: header, colData: colData})
 	}
 	return colist
 }
 
-func genRows(records [][]string) []RowList {
-	var rowlist []RowList
+func genRows(records [][]string) []rowList {
+	var rowlist []rowList
 	for _, record := range records[1:] {
-		rowlist = append(rowlist, RowList{rowData: record})
+		rowlist = append(rowlist, rowList{rowData: record})
 	}
 	return rowlist
 }
