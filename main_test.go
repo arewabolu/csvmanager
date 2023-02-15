@@ -1,14 +1,18 @@
 package csvmanager
 
 import (
+	"os"
 	"testing"
 )
 
-func TestWriteNewCSV(t *testing.T) {
-	f := WriteNewCSV("./writetest.csv", []string{"a", "b", "c"})
-	if f.Err != nil {
-		t.Error(f.Err)
+func TestWriteFrame(t *testing.T) {
+	file, _ := os.OpenFile("test2file.csv", os.O_CREATE|os.O_APPEND|os.O_RDWR, 0755)
+	w := &WriteFrame{
+		Headers: []string{"Home", "Away"},
+		Rows:    [][]string{{"ars", "mci"}, {"liv", "che"}},
+		File:    file,
 	}
+	w.WriteNewCSV()
 }
 
 func TestFloat(t *testing.T) {

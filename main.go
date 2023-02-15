@@ -22,6 +22,26 @@ type rowList struct {
 	rowData []string
 }
 
+type WriteFrame struct {
+	Headers []string
+	Rows    [][]string
+	File    *os.File
+}
+
+func (w *WriteFrame) WriteNewCSV() error {
+	wr := csv.NewWriter(w.File)
+	defer wr.Flush()
+	err := wr.Write(w.Headers)
+	if err != nil {
+		return err
+	}
+	err = wr.WriteAll(w.Rows)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 type Frame struct {
 	Headers []string
 	Cols    []colList
@@ -377,28 +397,6 @@ func (r rowList) String() []string {
 	nwDataString := make([]string, 0, len(r.rowData))
 	nwDataString = append(nwDataString, r.rowData...)
 	return nwDataString
-}
-
-// Create a new csv file.
-func WriteNewCSV(filePath string, rowData []string) Frame {
-	file, err := os.OpenFile(filePath, os.O_CREATE|os.O_WRONLY, 0700)
-	if err != nil {
-		return Frame{Err: err}
-	}
-
-	defer file.Close()
-
-	wr := csv.NewWriter(file)
-	defer wr.Flush()
-
-	for index := range rowData {
-		err = wr.Write([]string{rowData[index]})
-		if err != nil {
-			return Frame{Err: err}
-		}
-	}
-
-	return Frame{Err: nil}
 }
 
 // ReplaceRow is used to edit an existing row in a csv file.
