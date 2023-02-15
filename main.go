@@ -381,7 +381,7 @@ func (r rowList) String() []string {
 
 // Create a new csv file.
 func WriteNewCSV(filePath string, rowData []string) Frame {
-	file, err := os.OpenFile(filePath, os.O_CREATE, 0700)
+	file, err := os.OpenFile(filePath, os.O_CREATE|os.O_WRONLY, 0700)
 	if err != nil {
 		return Frame{Err: err}
 	}
@@ -391,14 +391,10 @@ func WriteNewCSV(filePath string, rowData []string) Frame {
 	wr := csv.NewWriter(file)
 	defer wr.Flush()
 
-	wr.Write(rowData)
-	//	for _, i := range entry {
-	//		fV := strconv.FormatFloat(i, 'f', 2, 64)
-	//		err := wr.Write([]string{fV})
-	//		if err != nil {
-	//			panic(err)
-	//}
-	//	}
+	err = wr.Write(rowData)
+	if err != nil {
+		return Frame{Err: err}
+	}
 	return Frame{Err: nil}
 }
 

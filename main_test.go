@@ -4,6 +4,13 @@ import (
 	"testing"
 )
 
+func TestWriteNewCSV(t *testing.T) {
+	f := WriteNewCSV("./writetest.csv", []string{"a", "b", "c"})
+	if f.Err != nil {
+		t.Error(f.Err)
+	}
+}
+
 func TestFloat(t *testing.T) {
 	rds, _ := ReadCsv("./BTCUSDT-1h-2022-11.csv")
 	Column := rds.Col("test").Float()
