@@ -391,10 +391,13 @@ func WriteNewCSV(filePath string, rowData []string) Frame {
 	wr := csv.NewWriter(file)
 	defer wr.Flush()
 
-	err = wr.Write(rowData)
-	if err != nil {
-		return Frame{Err: err}
+	for index := range rowData {
+		err = wr.Write([]string{rowData[index]})
+		if err != nil {
+			return Frame{Err: err}
+		}
 	}
+
 	return Frame{Err: nil}
 }
 
