@@ -35,10 +35,13 @@ func (w *WriteFrame) WriteNewCSV() error {
 	if err != nil {
 		return err
 	}
-	err = wr.WriteAll(w.Rows)
-	if err != nil {
-		return err
+	for _, val := range w.Rows {
+		err = wr.Write(val)
+		if err != nil {
+			return err
+		}
 	}
+
 	return nil
 }
 
