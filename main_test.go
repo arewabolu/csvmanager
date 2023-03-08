@@ -6,17 +6,17 @@ import (
 )
 
 func TestWriteFrame(t *testing.T) {
-	file, _ := os.OpenFile("test2file.csv", os.O_CREATE|os.O_APPEND|os.O_RDWR, 0755)
+	file, _ := os.OpenFile("test2file.csv", os.O_CREATE|os.O_RDWR, 0755)
 	w := &WriteFrame{
 		Headers: []string{"Home", "Away"},
-		Rows:    [][]string{{"ars", "mci"}, {"liv", "che"}},
+		Rows:    [][]string{{"ars", "mci"}, {"liv", "che"}, {"MU", "LU"}},
 		File:    file,
 	}
 	w.WriteNewCSV()
 }
 
 func TestFloat(t *testing.T) {
-	rds, _ := ReadCsv("./BTCUSDT-1h-2022-11.csv")
+	rds, _ := ReadCsv("./BTCUSDT-1h-2022-11.csv", true)
 	Column := rds.Col("test").Float()
 
 	if len(Column) == 0 {
@@ -28,7 +28,7 @@ func TestFloat(t *testing.T) {
 	}
 }
 func TestColumn(t *testing.T) {
-	rds, _ := ReadCsv("./BTCUSDT-1h-2022-11.csv", 200)
+	rds, _ := ReadCsv("./BTCUSDT-1h-2022-11.csv", false)
 	col := rds.Col("high").Float()
 
 	if col[0] != 20492.10 {
@@ -38,16 +38,16 @@ func TestColumn(t *testing.T) {
 }
 
 func TestRow(t *testing.T) {
-	rds, _ := ReadCsv("./BTCUSDT-1h-2022-11.csv")
+	rds, _ := ReadCsv("./BTCUSDT-1h-2022-11.csv", false)
 	row := rds.Row(1).Float()
-
+	t.Error(row[1])
 	if row[1] != 20445.50 {
 		t.Error("wrong row data")
 	}
 }
 
 func TestRows(t *testing.T) {
-	rds, _ := ReadCsv("./BTCUSDT-1h-2022-11.csv")
+	rds, _ := ReadCsv("./BTCUSDT-1h-2022-11.csv", true)
 	rows := rds.Rows(1, 2, 6)
 	nwRow := rows[1].Float()
 	expected := []float64{1667271600000, 20568.10, 20577.00, 20464.60, 20471.30, 11101.117, 1667275199999, 227631088.55590, 74440, 4800.732, 98433200.32610, 0}
@@ -73,7 +73,7 @@ func TestInterface(t *testing.T) {
 		Three float64
 	}
 	decRwStr := RwStr{}
-	rds, _ := ReadCsv("./BTCUSDT-1h-2022-11.csv")
+	rds, _ := ReadCsv("./BTCUSDT-1h-2022-11.csv", true)
 	err := rds.Row(2).Interface(&decRwStr)
 
 	if decRwStr.One != 1667268000000 {
@@ -84,7 +84,7 @@ func TestInterface(t *testing.T) {
 
 func TestInterface2(t *testing.T) {
 	var nwtr interface{}
-	rds, _ := ReadCsv("./BTCUSDT-1h-2022-11.csv")
+	rds, _ := ReadCsv("./BTCUSDT-1h-2022-11.csv", true)
 	err := rds.Row(2).Interface(&nwtr)
 	if err != nil {
 		t.Error(err)
