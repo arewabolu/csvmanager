@@ -307,7 +307,7 @@ func (f Frame) ListHeaders() []string {
 	return f.Headers
 }
 
-func ReadCsv(filePath string, bufSize ...int) (Frame, error) {
+func ReadCsv(filePath string, header bool, bufSize ...int) (Frame, error) {
 	file, err := os.Open(filePath)
 	if err != nil {
 		return Frame{}, err
@@ -326,11 +326,21 @@ func ReadCsv(filePath string, bufSize ...int) (Frame, error) {
 	if err != nil {
 		return Frame{}, err
 	}
-	f := Frame{
-		Headers: records[0],
-		Cols:    genCols(records),
-		Rws:     genRows(records),
+
+	var f Frame
+	if !header {
+		f = Frame{
+			Cols: genCols(records),
+			Rws:  genRows(records, 0),
+		}
+	} else {
+		f = Frame{
+			Headers: records[0],
+			Cols:    genCols(records),
+			Rws:     genRows(records, 1),
+		}
 	}
+
 	return f, nil
 }
 

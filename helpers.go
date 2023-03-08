@@ -26,9 +26,9 @@ func genCols(records [][]string) []colList {
 	return colist
 }
 
-func genRows(records [][]string) []rowList {
+func genRows(records [][]string, start int) []rowList {
 	var rowlist []rowList
-	for _, record := range records[1:] {
+	for _, record := range records[start:] {
 		rowlist = append(rowlist, rowList{rowData: record})
 	}
 	return rowlist
