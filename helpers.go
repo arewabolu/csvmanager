@@ -33,3 +33,17 @@ func genRows(records [][]string, start int) []rowList {
 	}
 	return rowlist
 }
+
+func extractItems(slice [][]string, n int) []string {
+	var result []string
+
+	for _, innerSlice := range slice {
+		if n < len(innerSlice) {
+			result = append(result, innerSlice[n])
+		} else {
+			result = append(result, "")
+		}
+	}
+
+	return result
+}

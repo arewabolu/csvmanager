@@ -35,8 +35,9 @@ func (w *WriteFrame) WriteNewCSV() error {
 	if err != nil {
 		return err
 	}
-	for _, val := range w.Rows {
-		err = wr.Write(val)
+
+	for i := 0; i < len(w.Rows[0]); i++ {
+		err = wr.Write(extractItems(w.Rows, i))
 		if err != nil {
 			return err
 		}
