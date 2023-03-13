@@ -92,3 +92,13 @@ func TestInterface2(t *testing.T) {
 		t.Error(err)
 	}
 }
+
+func TestColWithPositon(t *testing.T) {
+	rds, _ := ReadCsv("./BTCUSDT-1h-2022-11.csv", true)
+	col := rds.ColWithPosition(1).Float()
+
+	if col[0] != 20482.10 {
+		t.Error("not the same column data")
+	}
+
+}

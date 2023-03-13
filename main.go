@@ -241,6 +241,13 @@ func (f Frame) Col(colName string) colList {
 	return colList{}
 }
 
+// returns column specified by the parameter
+// columns index alsways start from 0.
+// ColWithPosition is recommended to be used when header is false
+func (f Frame) ColWithPosition(colPos int) colList {
+	return f.cols[colPos]
+}
+
 func (f Frame) ColLength() int {
 	return len(f.cols)
 }
