@@ -23,12 +23,18 @@ type rowList struct {
 }
 
 type WriteFrame struct {
+	//list all csv headers here
 	Headers []string
-	Rows    [][]string
-	File    *os.File
+	//columns should contain a list of all columns
+	//which be properly formatted
+	Columns [][]string
+	//File should be a file with right permissions
+	//to be written to
+	File *os.File
 }
 
-func (w *WriteFrame) WriteNewCSV() error {
+// Write to Csv file after WriteFrame implentation
+func (w *WriteFrame) WriteCSV() error {
 	wr := csv.NewWriter(w.File)
 	defer wr.Flush()
 	err := wr.Write(w.Headers)
@@ -36,8 +42,8 @@ func (w *WriteFrame) WriteNewCSV() error {
 		return err
 	}
 
-	for i := 0; i < len(w.Rows[0]); i++ {
-		err = wr.Write(extractItems(w.Rows, i))
+	for i := 0; i < len(w.Columns[0]); i++ {
+		err = wr.Write(extractItems(w.Columns, i))
 		if err != nil {
 			return err
 		}
@@ -47,10 +53,10 @@ func (w *WriteFrame) WriteNewCSV() error {
 }
 
 type Frame struct {
-	Headers []string
-	Cols    []colList
-	Rws     []rowList
-	Err     error
+	headers []string
+	cols    []colList
+	rws     []rowList
+	err     error
 }
 
 type Types interface {
@@ -61,6 +67,9 @@ type Types interface {
 	Interface(v interface{}) error
 }
 
+// Interface should be used to convert rows into  a defined struct
+// The position of the item on the row could also be set to a particular field
+// using struct tags
 func (r rowList) Interface(v interface{}) error {
 	result := reflect.ValueOf(v).Elem() //
 	if result.Kind() != reflect.Struct {
@@ -224,7 +233,7 @@ func (r rowList) Bool() []bool {
 
 func (f Frame) Col(colName string) colList {
 
-	for _, record := range f.Cols {
+	for _, record := range f.cols {
 		if colName == record.header {
 			return record
 		}
@@ -233,14 +242,14 @@ func (f Frame) Col(colName string) colList {
 }
 
 func (f Frame) ColLength() int {
-	return len(f.Cols)
+	return len(f.cols)
 }
 
 // Check if a header exists in the frame
 // returns and error if false otherwise
 // it returns the headers position in the slice
 func (f Frame) CheckHeader(header string) (int, error) {
-	pos, ok := slices.BinarySearch(f.Headers, header)
+	pos, ok := slices.BinarySearch(f.headers, header)
 	if !ok {
 		return -1, errors.New("header not found")
 	}
@@ -305,7 +314,7 @@ func (r rowList) Int() []int {
 
 // List all headers in the given frame
 func (f Frame) ListHeaders() []string {
-	return f.Headers
+	return f.headers
 }
 
 func ReadCsv(filePath string, header bool, bufSize ...int) (Frame, error) {
@@ -331,14 +340,14 @@ func ReadCsv(filePath string, header bool, bufSize ...int) (Frame, error) {
 	var f Frame
 	if !header {
 		f = Frame{
-			Cols: genCols(records),
-			Rws:  genRows(records, 0),
+			cols: genCols(records),
+			rws:  genRows(records, 0),
 		}
 	} else {
 		f = Frame{
-			Headers: records[0],
-			Cols:    genCols(records),
-			Rws:     genRows(records, 1),
+			headers: records[0],
+			cols:    genCols(records),
+			rws:     genRows(records, 1),
 		}
 	}
 
@@ -348,10 +357,10 @@ func ReadCsv(filePath string, header bool, bufSize ...int) (Frame, error) {
 /**/
 // Row returns only one row
 func (f Frame) Row(rowLine int) rowList {
-	if rowLine < 0 || rowLine > len(f.Rws) {
+	if rowLine < 0 || rowLine > len(f.rws) {
 		panic("provided index out of bounds")
 	}
-	return f.Rws[rowLine]
+	return f.rws[rowLine]
 }
 
 // Row returns the rows specified by Range.
@@ -362,24 +371,24 @@ func (f Frame) Row(rowLine int) rowList {
 // Only 0,2, or 3 values can be specified.
 func (f Frame) Rows(Range ...int) []rowList {
 	if len(Range) == 0 {
-		return f.Rws
+		return f.rws
 	}
-	if Range[0] < 0 || Range[0] > len(f.Rws) {
+	if Range[0] < 0 || Range[0] > len(f.rws) {
 		panic("provided index out of bounds")
 	}
-	if Range[1] < 0 || Range[1] > len(f.Rws) {
+	if Range[1] < 0 || Range[1] > len(f.rws) {
 		panic("provided index out of bounds")
 	}
-	if Range[1] < 0 || Range[2] > len(f.Rws) {
+	if Range[1] < 0 || Range[2] > len(f.rws) {
 		panic("provided index out of bounds")
 	}
 	if len(Range) == 2 {
-		return f.Rws[Range[0]:Range[1]]
+		return f.rws[Range[0]:Range[1]]
 	}
 	if len(Range) == 3 {
 		Length := make([]rowList, 0)
 		for i := Range[0]; i <= Range[2]; i += Range[1] {
-			Length = append(Length, f.Rws[i])
+			Length = append(Length, f.rws[i])
 		}
 		return Length
 	}
@@ -396,7 +405,7 @@ func (r rowList) RowsLength() int {
 
 // returns the number of rows in the read file
 func (f Frame) SizeofRows() int {
-	return len(f.Rws)
+	return len(f.rws)
 }
 
 // String returns an array of string values for given column
@@ -419,23 +428,23 @@ func (r rowList) String() []string {
 func ReplaceRow(filePath string, pos int, nwData []string) Frame {
 	file, err := os.OpenFile(filePath, os.O_RDWR, 0700)
 	if err != nil {
-		return Frame{Err: err}
+		return Frame{err: err}
 	}
 	defer file.Close()
 	rdder := csv.NewReader(file)
 	rdRecords, err := rdder.ReadAll()
 	if err != nil {
-		return Frame{Err: err}
+		return Frame{err: err}
 	}
 	if pos >= len(rdRecords) || pos < 0 {
-		return Frame{Err: errors.New("replacing nonexistent row is not supported")}
+		return Frame{err: errors.New("replacing nonexistent row is not supported")}
 	}
 
 	nwRecords := gohaskell.Pop(rdRecords, pos)
 	nwRecords = gohaskell.Put(nwRecords, nwData, pos)
 	nwFile, err := os.Create(filePath)
 	if err != nil {
-		return Frame{Err: errors.New("could not overrite existing file")}
+		return Frame{err: errors.New("could not overrite existing file")}
 	}
 
 	wr := csv.NewWriter(nwFile)
@@ -445,5 +454,5 @@ func ReplaceRow(filePath string, pos int, nwData []string) Frame {
 		wr.Write(rec)
 	}
 
-	return Frame{Err: nil}
+	return Frame{err: nil}
 }

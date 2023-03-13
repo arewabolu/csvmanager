@@ -11,10 +11,10 @@ func TestWriteFrame(t *testing.T) {
 	x2 := []string{"mci", "che", "lu"}
 	w := &WriteFrame{
 		Headers: []string{"Home", "Away"},
-		Rows:    [][]string{x1, x2},
+		Columns: [][]string{x1, x2},
 		File:    file,
 	}
-	w.WriteNewCSV()
+	w.WriteCSV()
 }
 
 func TestFloat(t *testing.T) {
@@ -61,8 +61,8 @@ func TestRows(t *testing.T) {
 func TestReplaceRow(t *testing.T) {
 	rep := ReplaceRow("./test.csv", 1, []string{"j", "e", "x"})
 
-	if rep.Err != nil {
-		t.Error(rep.Err)
+	if rep.err != nil {
+		t.Error(rep.err)
 	} else {
 		return
 	}
