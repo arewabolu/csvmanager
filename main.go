@@ -60,12 +60,7 @@ func (w *WriteFrame) WriteCSV() error {
 			}
 		}
 	default:
-		for _, record := range w.Arrays {
-			err := wr.Write(record)
-			if err != nil {
-				return err
-			}
-		}
+		wr.WriteAll(w.Arrays)
 	}
 
 	return nil
