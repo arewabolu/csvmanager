@@ -44,15 +44,17 @@ type WriteFrame struct {
 func (w *WriteFrame) WriteCSV() error {
 	wr := csv.NewWriter(w.File)
 	defer wr.Flush()
-	err := wr.Write(w.Headers)
-	if err != nil {
-		return err
+	if len(w.Headers) > 0 {
+		err := wr.Write(w.Headers)
+		if err != nil {
+			return err
+		}
 	}
 
 	switch {
 	case w.Column:
 		for i := 0; i < len(w.Arrays[0]); i++ {
-			err = wr.Write(extractItems(w.Arrays, i))
+			err := wr.Write(extractItems(w.Arrays, i))
 			if err != nil {
 				return err
 			}

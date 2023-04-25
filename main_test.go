@@ -16,12 +16,11 @@ func TestWriteFrame(t *testing.T) {
 		File:    file,
 	}
 	w.WriteCSV()
-	file2, _ := os.OpenFile("test5file.csv", os.O_CREATE|os.O_RDWR, 0755)
+	file2, _ := os.OpenFile("test5file.csv", os.O_CREATE|os.O_RDWR|os.O_APPEND, 0755)
 	w2 := &WriteFrame{
-		Headers: []string{"Home", "Away"},
-		Column:  true,
-		Arrays:  [][]string{x1, x2},
-		File:    file2,
+		Column: true,
+		Arrays: [][]string{x1, x2},
+		File:   file2,
 	}
 	w2.WriteCSV()
 }
