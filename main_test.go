@@ -6,15 +6,24 @@ import (
 )
 
 func TestWriteFrame(t *testing.T) {
-	file, _ := os.OpenFile("test3file.csv", os.O_CREATE|os.O_RDWR, 0755)
+	file, _ := os.OpenFile("test4file.csv", os.O_CREATE|os.O_RDWR, 0755)
 	x1 := []string{"ars", "liv", "mu"}
 	x2 := []string{"mci", "che", "lu"}
 	w := &WriteFrame{
 		Headers: []string{"Home", "Away"},
-		Columns: [][]string{x1, x2},
+		Column:  false,
+		Arrays:  [][]string{x1, x2},
 		File:    file,
 	}
 	w.WriteCSV()
+	file2, _ := os.OpenFile("test5file.csv", os.O_CREATE|os.O_RDWR, 0755)
+	w2 := &WriteFrame{
+		Headers: []string{"Home", "Away"},
+		Column:  true,
+		Arrays:  [][]string{x1, x2},
+		File:    file2,
+	}
+	w2.WriteCSV()
 }
 
 func TestFloat(t *testing.T) {

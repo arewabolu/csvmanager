@@ -25,11 +25,18 @@ type rowList struct {
 type WriteFrame struct {
 	//list all csv headers here
 	Headers []string
+	// Set to true if []string is a list of columns.
+	//
+	// If not set Row automatically defaults to true.
+	Column bool
+	// Set to true if []string is a list of rows.
+	//
+	//Note: Default is true
+	Row bool
 	//columns should contain a list of all columns
 	//which be properly formatted
-	Columns [][]string
-	//File should be a file with right permissions
-	//to be written to
+	Arrays [][]string
+	//File should be a file with right permissions to be written to
 	File *os.File
 }
 
@@ -42,10 +49,20 @@ func (w *WriteFrame) WriteCSV() error {
 		return err
 	}
 
-	for i := 0; i < len(w.Columns[0]); i++ {
-		err = wr.Write(extractItems(w.Columns, i))
-		if err != nil {
-			return err
+	switch {
+	case w.Column:
+		for i := 0; i < len(w.Arrays[0]); i++ {
+			err = wr.Write(extractItems(w.Arrays, i))
+			if err != nil {
+				return err
+			}
+		}
+	default:
+		for _, record := range w.Arrays {
+			err := wr.Write(record)
+			if err != nil {
+				return err
+			}
 		}
 	}
 
