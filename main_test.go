@@ -47,6 +47,14 @@ func TestColumn(t *testing.T) {
 
 }
 
+func TestStrConv(t *testing.T) {
+	int1 := []int{1, 2, 3, 4, 5}
+	strInt1 := StringConv(int1)
+	if strInt1[2] != "4" {
+		t.Error("Unable to convert integer to string")
+	}
+}
+
 func TestRow(t *testing.T) {
 	rds, _ := ReadCsv("./BTCUSDT-1h-2022-11.csv", false)
 	row := rds.Row(1).Float()

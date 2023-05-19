@@ -40,6 +40,15 @@ type WriteFrame struct {
 	File *os.File
 }
 
+func StringConv[T any](arr []T) []string {
+	nwArr := make([]string, 0, len(arr))
+	for _, v := range arr {
+		nwV := fmt.Sprint(v)
+		nwArr = append(nwArr, nwV)
+	}
+	return nwArr
+}
+
 // Write to Csv file after WriteFrame implentation
 func (w *WriteFrame) WriteCSV() error {
 	wr := csv.NewWriter(w.File)
