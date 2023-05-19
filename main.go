@@ -5,6 +5,7 @@ import (
 	"encoding/csv"
 	"errors"
 	"fmt"
+	"io/fs"
 	"os"
 	"reflect"
 	"strconv"
@@ -347,8 +348,8 @@ func (f Frame) ListHeaders() []string {
 	return f.headers
 }
 
-func ReadCsv(filePath string, header bool, bufSize ...int) (Frame, error) {
-	file, err := os.Open(filePath)
+func ReadCsv(filePath string, perm fs.FileMode, header bool, bufSize ...int) (Frame, error) {
+	file, err := os.OpenFile(filePath, os.O_CREATE|os.O_RDONLY, perm)
 	if err != nil {
 		return Frame{}, err
 	}
@@ -455,8 +456,8 @@ func (r rowList) String() []string {
 // ReplaceRow is used to edit an existing row in a csv file.
 //
 // It does not create a new file, it only updates the existing file with the edited row.
-func ReplaceRow(filePath string, pos int, nwData []string) Frame {
-	file, err := os.OpenFile(filePath, os.O_RDWR, 0700)
+func ReplaceRow(filePath string, perm fs.FileMode, pos int, nwData []string) Frame {
+	file, err := os.OpenFile(filePath, os.O_RDWR, perm)
 	if err != nil {
 		return Frame{err: err}
 	}
