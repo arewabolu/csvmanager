@@ -1,4 +1,6 @@
-github.com/arewabolu/GoHaskell v0.0.3 h1:ca6EKhLKhO1POnwF+Zsh8CqqwcvKRGlYNpD8ZTPrdwo=
-github.com/arewabolu/GoHaskell v0.0.3/go.mod h1:khrj7nU7ytM2hOg/YsKlTw0ISyiiVuIViFMcTcAHrug=
+github.com/arewabolu/GoHaskell v0.0.5 h1:6Out2nsMex3X7Y8hcV8iN90hOL5tCktzKLX2hMNUu1M=
+github.com/arewabolu/GoHaskell v0.0.5/go.mod h1:khrj7nU7ytM2hOg/YsKlTw0ISyiiVuIViFMcTcAHrug=
 golang.org/x/exp v0.0.0-20230118134722-a68e582fa157 h1:fiNkyhJPUvxbRPbCqY/D9qdjmPzfHcpK3P4bM4gioSY=
 golang.org/x/exp v0.0.0-20230118134722-a68e582fa157/go.mod h1:CxIveKay+FTh1D0yPZemJVgC/95VzuuOLq5Qi4xnoYc=
+golang.org/x/exp v0.0.0-20230519143937-03e91628a987 h1:3xJIFvzUFbu4ls0BTBYcgbCGhA63eAOEMxIHugyXJqA=
+golang.org/x/exp v0.0.0-20230519143937-03e91628a987/go.mod h1:V1LtkGg67GoY2N1AnLN78QLrzxkLyJw7RJb1gzOOz9w=
