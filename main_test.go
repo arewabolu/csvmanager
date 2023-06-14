@@ -6,12 +6,12 @@ import (
 )
 
 func TestWriteFrame(t *testing.T) {
-	file, _ := os.OpenFile("test4file.csv", os.O_CREATE|os.O_RDWR, 0755)
+	file, _ := os.OpenFile("testwritefile.csv", os.O_CREATE|os.O_RDWR|os.O_APPEND, 0755)
 	x1 := []string{"ars", "liv", "mu"}
-	x2 := []string{"mci", "che", "lu"}
+	x2 := []string{"mci", "che", "la"}
 	w := &WriteFrame{
 		Headers: []string{"Home", "Away"},
-		Column:  false,
+		Row:     true,
 		Arrays:  [][]string{x1, x2},
 		File:    file,
 	}
@@ -84,17 +84,20 @@ func TestReplaceRow(t *testing.T) {
 	}
 }
 
-func TestInterface(t *testing.T) {
-	type RwStr struct {
-		One   int
-		Two   float64 `position:"5"` // testing tags
-		Three float64
-	}
-	decRwStr := RwStr{}
-	rds, _ := ReadCsv("./BTCUSDT-1h-2022-11.csv", 0666, true)
-	err := rds.Row(2).Interface(&decRwStr)
+type RwStr struct {
+	One   int
+	Two   float64 `position:"5"` // testing tags
+	Three float64
+}
 
-	if decRwStr.One != 1667268000000 {
+func TestInterface(t *testing.T) {
+
+	decRwStr := &RwStr{}
+	rds, _ := ReadCsv("./BTCUSDT-1h-2022-11.csv", 0666, true)
+	err := rds.Row(2).Interface(decRwStr)
+
+	if decRwStr.One == 1667268000000 {
+		t.Error(decRwStr)
 		t.Error(err)
 	}
 
@@ -117,4 +120,15 @@ func TestColWithPositon(t *testing.T) {
 		t.Error("not the same column data")
 	}
 
+}
+
+func TestReadHeader(t *testing.T) {
+	rds, _ := ReadCsv("./BTCUSDT-1h-2022-11.csv", 0666, true)
+	header, err := rds.CheckHeader("open_time")
+	if err != nil {
+		t.Error(err)
+	}
+	if header < 0 {
+		t.Error(err)
+	}
 }

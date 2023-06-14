@@ -280,10 +280,11 @@ func (f Frame) ColLength() int {
 // returns and error if false otherwise
 // it returns the headers position in the slice
 func (f Frame) CheckHeader(header string) (int, error) {
-	pos, ok := slices.BinarySearch(f.headers, header)
+	ok := slices.Contains(f.headers, header)
 	if !ok {
 		return -1, errors.New("header not found")
 	}
+	pos := slices.Index(f.headers, header)
 	return pos, nil
 }
 
