@@ -80,7 +80,6 @@ type Frame struct {
 	headers []string
 	cols    []colList
 	rws     []rowList
-	err     error
 }
 
 type Types interface {
@@ -457,26 +456,26 @@ func (r rowList) String() []string {
 // ReplaceRow is used to edit an existing row in a csv file.
 //
 // It does not create a new file, it only updates the existing file with the edited row.
-func ReplaceRow(filePath string, perm fs.FileMode, pos int, nwData []string) Frame {
+func ReplaceRow(filePath string, perm fs.FileMode, pos int, nwData []string) error {
 	file, err := os.OpenFile(filePath, os.O_RDWR, perm)
 	if err != nil {
-		return Frame{err: err}
+		return err
 	}
 	defer file.Close()
 	rdder := csv.NewReader(file)
 	rdRecords, err := rdder.ReadAll()
 	if err != nil {
-		return Frame{err: err}
+		return err
 	}
 	if pos >= len(rdRecords) || pos < 0 {
-		return Frame{err: errors.New("replacing nonexistent row is not supported")}
+		return fmt.Errorf("%s has only %v rows", filePath, len(rdRecords))
 	}
 
 	nwRecords := gohaskell.Pop(rdRecords, pos)
 	nwRecords = gohaskell.Put(nwRecords, nwData, pos)
 	nwFile, err := os.Create(filePath)
 	if err != nil {
-		return Frame{err: errors.New("could not overrite existing file")}
+		return errors.New("could not overrite existing file")
 	}
 
 	wr := csv.NewWriter(nwFile)
@@ -486,5 +485,5 @@ func ReplaceRow(filePath string, perm fs.FileMode, pos int, nwData []string) Fra
 		wr.Write(rec)
 	}
 
-	return Frame{err: nil}
+	return nil
 }

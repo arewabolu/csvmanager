@@ -75,10 +75,10 @@ func TestRows(t *testing.T) {
 }
 
 func TestReplaceRow(t *testing.T) {
-	rep := ReplaceRow("./test.csv", 0770, 1, []string{"q", "e", "x"})
+	err := ReplaceRow("./test.csv", 0770, 1, []string{"q", "e", "x"})
 
-	if rep.err != nil {
-		t.Error(rep.err)
+	if err != nil {
+		t.Error(err)
 	} else {
 		return
 	}
