@@ -16,13 +16,6 @@ func TestWriteFrame(t *testing.T) {
 		File:    file,
 	}
 	w.WriteCSV()
-	file2, _ := os.OpenFile("test5file.csv", os.O_CREATE|os.O_RDWR|os.O_APPEND, 0755)
-	w2 := &WriteFrame{
-		Column: true,
-		Arrays: [][]string{x1, x2},
-		File:   file2,
-	}
-	w2.WriteCSV()
 }
 
 func TestFloat(t *testing.T) {
@@ -79,6 +72,7 @@ func TestReplaceRow(t *testing.T) {
 
 	if err != nil {
 		t.Error(err)
+		t.Error()
 	} else {
 		return
 	}
@@ -131,4 +125,12 @@ func TestReadHeader(t *testing.T) {
 	if header < 0 {
 		t.Error(err)
 	}
+}
+
+func TestPrependRow(t *testing.T) {
+	err := PrependRow("./test.csv", 0770, true, []string{"f", "k", "m"})
+	if err != nil {
+		t.Error(err)
+	}
+
 }

@@ -14,33 +14,6 @@ import (
 	"golang.org/x/exp/slices"
 )
 
-type colList struct {
-	header  string
-	colData []string
-}
-
-type rowList struct {
-	rowData []string
-}
-
-type WriteFrame struct {
-	//list all csv headers here
-	Headers []string
-	// Set to true if []string is a list of columns.
-	//
-	// If not set Row automatically defaults to true.
-	Column bool
-	// Set to true if []string is a list of rows.
-	//
-	//Note: Default is true
-	Row bool
-	//columns should contain a list of all columns
-	//which be properly formatted
-	Arrays [][]string
-	//File should be a file with right permissions to be written to
-	File *os.File
-}
-
 func StringConv[T any](arr []T) []string {
 	nwArr := make([]string, 0, len(arr))
 	for _, v := range arr {
@@ -74,20 +47,6 @@ func (w *WriteFrame) WriteCSV() error {
 	}
 
 	return nil
-}
-
-type Frame struct {
-	headers []string
-	cols    []colList
-	rws     []rowList
-}
-
-type Types interface {
-	Float() []float64
-	Int() []int
-	Bool() []bool
-	String() []string
-	Interface(v interface{}) error
 }
 
 // Interface should be used to convert rows into  a defined struct
@@ -485,5 +444,33 @@ func ReplaceRow(filePath string, perm fs.FileMode, pos int, nwData []string) err
 		wr.Write(rec)
 	}
 
+	return nil
+}
+
+func PrependRow(filePath string, perm fs.FileMode, header bool, nwData []string) error {
+	data, err := ReadCsv(filePath, perm, header)
+	if err != nil {
+		return err
+	}
+	dataRws := data.Rows
+	strRows := extractRowsString(dataRws())
+
+	nwFile, err := os.OpenFile(filePath, os.O_CREATE|os.O_WRONLY, perm)
+	if err != nil {
+		return errors.New("could not overrite existing file")
+	}
+	nwRows := make([][]string, 0, len(strRows)+1)
+	nwRows = append(nwRows, nwData)
+	nwRows = append(nwRows, strRows...)
+	wr := WriteFrame{
+		Headers: data.headers,
+		Row:     true,
+		Arrays:  nwRows,
+		File:    nwFile,
+	}
+	err = wr.WriteCSV()
+	if err != nil {
+		return err
+	}
 	return nil
 }
