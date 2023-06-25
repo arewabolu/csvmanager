@@ -47,3 +47,12 @@ func extractItems(slice [][]string, n int) []string {
 
 	return result
 }
+
+func extractRowsString(rows []rowList) [][]string {
+	data := make([][]string, 0, len(rows))
+	for i := 0; i < len(rows); i++ {
+		rows := rows[i].String()
+		data = append(data, rows)
+	}
+	return data
+}
