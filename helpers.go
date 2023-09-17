@@ -18,6 +18,9 @@ func newCol(header string, records [][]string) []string {
 }
 
 func genCols(records [][]string) []colList {
+	if len(records) == 0 {
+		return []colList{}
+	}
 	var colist []colList
 	for _, header := range records[0] {
 		colData := newCol(header, records)
@@ -27,6 +30,9 @@ func genCols(records [][]string) []colList {
 }
 
 func genRows(records [][]string, start int) []rowList {
+	if len(records) == 0 {
+		return []rowList{}
+	}
 	var rowlist []rowList
 	for _, record := range records[start:] {
 		rowlist = append(rowlist, rowList{rowData: record})
