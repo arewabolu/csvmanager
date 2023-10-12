@@ -19,7 +19,7 @@ func TestWriteFrame(t *testing.T) {
 }
 
 func TestFloat(t *testing.T) {
-	rds, _ := ReadCsv("./BTCUSDT-1h-2022-11.csv", 0666, true)
+	rds, _ := ReadCsv("./BTCUSDT-1h-2022-11.csv", true)
 	Column := rds.Col("test").Float()
 
 	if len(Column) == 0 {
@@ -31,7 +31,7 @@ func TestFloat(t *testing.T) {
 	}
 }
 func TestColumn(t *testing.T) {
-	rds, _ := ReadCsv("./BTCUSDT-1h-2022-11.csv", 0666, false)
+	rds, _ := ReadCsv("./BTCUSDT-1h-2022-11.csv", false)
 	col := rds.Col("high").Float()
 
 	if col[0] != 20492.10 {
@@ -49,7 +49,7 @@ func TestStrConv(t *testing.T) {
 }
 
 func TestRow(t *testing.T) {
-	rds, _ := ReadCsv("./BTCUSDT-1h-2022-11.csv", 0666, false)
+	rds, _ := ReadCsv("./BTCUSDT-1h-2022-11.csv", false)
 	row := rds.Row(1).Float()
 	t.Error(row[1])
 	if row[1] != 20445.50 {
@@ -58,7 +58,7 @@ func TestRow(t *testing.T) {
 }
 
 func TestRows(t *testing.T) {
-	rds, _ := ReadCsv("./BTCUSDT-1h-2022-11.csv", 0666, true)
+	rds, _ := ReadCsv("./BTCUSDT-1h-2022-11.csv", true)
 	rows := rds.Rows(1, 2, 6)
 	nwRow := rows[1].Float()
 	expected := []float64{1667271600000, 20568.10, 20577.00, 20464.60, 20471.30, 11101.117, 1667275199999, 227631088.55590, 74440, 4800.732, 98433200.32610, 0}
@@ -86,10 +86,10 @@ type RwStr struct {
 
 func TestInterface(t *testing.T) {
 
-	decRwStr := &RwStr{}
-	rds, _ := ReadCsv("./BTCUSDT-1h-2022-11.csv", 0666, true)
-	err := rds.Row(2).Interface(decRwStr)
-
+	decRwStr := RwStr{}
+	rds, _ := ReadCsv("./BTCUSDT-1h-2022-11.csv", true)
+	err := rds.Row(2).Interface(&decRwStr)
+	t.Error(decRwStr)
 	if decRwStr.One == 1667268000000 {
 		t.Error(decRwStr)
 		t.Error(err)
@@ -99,7 +99,7 @@ func TestInterface(t *testing.T) {
 
 func TestInterface2(t *testing.T) {
 	var nwtr interface{}
-	rds, _ := ReadCsv("./BTCUSDT-1h-2022-11.csv", 0666, true)
+	rds, _ := ReadCsv("./BTCUSDT-1h-2022-11.csv", true)
 	err := rds.Row(2).Interface(&nwtr)
 	if err != nil {
 		t.Error(err)
@@ -107,7 +107,7 @@ func TestInterface2(t *testing.T) {
 }
 
 func TestColWithPositon(t *testing.T) {
-	rds, _ := ReadCsv("./BTCUSDT-1h-2022-11.csv", 0666, true)
+	rds, _ := ReadCsv("/home/arthemis/bettor/PES21_Eng", true)
 	col := rds.ColWithPosition(1).Float()
 
 	if col[0] != 20482.10 {
@@ -117,7 +117,7 @@ func TestColWithPositon(t *testing.T) {
 }
 
 func TestReadHeader(t *testing.T) {
-	rds, _ := ReadCsv("./BTCUSDT-1h-2022-11.csv", 0666, true)
+	rds, _ := ReadCsv("./BTCUSDT-1h-2022-11.csv", true)
 	header, err := rds.CheckHeader("open_time")
 	if err != nil {
 		t.Error(err)
@@ -128,7 +128,7 @@ func TestReadHeader(t *testing.T) {
 }
 
 func TestPrependRow(t *testing.T) {
-	err := PrependRow("./test.csv", 0770, true, []string{"f", "k", "m"})
+	err := PrependRow("./test.csv", true, []string{"f", "k", "m"})
 	if err != nil {
 		t.Error(err)
 	}

@@ -299,7 +299,7 @@ func (f Frame) ListHeaders() []string {
 }
 
 // Reads the csv file in the file path given
-func ReadCsv(filePath string, perm fs.FileMode, header bool, bufSize ...int) (Frame, error) {
+func ReadCsv(filePath string, header bool, bufSize ...int) (Frame, error) {
 	file, err := os.Open(filePath)
 	if err != nil {
 		return Frame{}, err
@@ -442,15 +442,15 @@ func ReplaceRow(filePath string, perm fs.FileMode, pos int, nwData []string) err
 	return nil
 }
 
-func PrependRow(filePath string, perm fs.FileMode, header bool, nwData []string) error {
-	data, err := ReadCsv(filePath, perm, header)
+func PrependRow(filePath string, header bool, nwData []string) error {
+	data, err := ReadCsv(filePath, header)
 	if err != nil {
 		return err
 	}
 	dataRws := data.Rows
 	strRows := extractRowsString(dataRws())
 
-	nwFile, err := os.OpenFile(filePath, os.O_CREATE|os.O_WRONLY, perm)
+	nwFile, err := os.OpenFile(filePath, os.O_CREATE|os.O_WRONLY, 0755)
 	if err != nil {
 		return errors.New("could not overrite existing file")
 	}
