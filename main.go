@@ -50,12 +50,10 @@ func (w *WriteFrame) WriteCSV() error {
 }
 
 // Interface should be used to convert rows into  a defined struct
-// The position of the item on the row could also be set to a particular field
-// using struct tags
-func (r rowList) Interface(v interface{}) error {
-	result := reflect.ValueOf(v).Elem() //
+func (r rowList) Interface(value interface{}) error {
+	result := reflect.ValueOf(value).Elem() //Elem instead of interface{} to unbox the value/dereference the pointer
 	if result.Kind() != reflect.Struct {
-		return errors.New("need struct, v is not a struct")
+		return errors.New("need struct, value is not a struct")
 	}
 	resultType := result.Type()
 
@@ -68,14 +66,6 @@ func (r rowList) Interface(v interface{}) error {
 		// skip hidden fields
 		if field.PkgPath != "" {
 			continue
-		}
-
-		// get sructs field tpe
-		// get query parameter name
-		key := field.Tag.Get("position")
-		pos, err := strconv.Atoi(key)
-		if err != nil || key == "" {
-			pos = i
 		}
 
 		// make sure we're not using a pointer
@@ -92,84 +82,85 @@ func (r rowList) Interface(v interface{}) error {
 			return errors.New("cannot set field " + field.Name)
 		}
 
-		var out interface{}
+		var out interface{} // use out to box return value and type
+		var err error
 
 		switch fieldKind {
 		case reflect.Bool:
-			out, err = strconv.ParseBool(r.rowData[pos])
+			out, err = strconv.ParseBool(r.rowData[i])
 			if err != nil {
 				return errors.New("failed to parse bool" + field.Name)
 			}
 		case reflect.Int:
-			i, err := strconv.ParseInt(r.rowData[pos], 10, fieldType.Bits())
+			val, err := strconv.ParseInt(r.rowData[i], 10, fieldType.Bits())
 			if err != nil {
 				return errors.New("failed to parse int" + field.Name)
 			}
-			out = int(i)
+			out = int(val)
 		case reflect.Int8:
-			i, err := strconv.ParseInt(r.rowData[pos], 10, 8)
+			val, err := strconv.ParseInt(r.rowData[i], 10, 8)
 			if err != nil {
 				return errors.New("failed to parse int8" + field.Name)
 			}
-			out = int8(i)
+			out = int8(val)
 		case reflect.Int16:
-			i, err := strconv.ParseInt(r.rowData[pos], 10, 16)
+			val, err := strconv.ParseInt(r.rowData[i], 10, 16)
 			if err != nil {
 				return errors.New("failed to parse int16" + field.Name)
 			}
-			out = int16(i)
+			out = int16(val)
 		case reflect.Int32:
-			i, err := strconv.ParseInt(r.rowData[pos], 10, 32)
+			val, err := strconv.ParseInt(r.rowData[i], 10, 32)
 			if err != nil {
 				return errors.New("failed to parse int32" + field.Name)
 			}
-			out = int32(i)
+			out = int32(val)
 		case reflect.Int64:
-			if out, err = strconv.ParseInt(r.rowData[pos], 10, 64); err != nil {
+			if out, err = strconv.ParseInt(r.rowData[i], 10, 64); err != nil {
 				return errors.New("failed to parse int64" + field.Name)
 			}
 		case reflect.Uint:
-			u, err := strconv.ParseUint(r.rowData[pos], 10, fieldType.Bits())
+			u, err := strconv.ParseUint(r.rowData[i], 10, fieldType.Bits())
 			if err != nil {
 				return errors.New("failed to parse uint" + field.Name)
 			}
 			out = uint(u)
 		case reflect.Uint8:
-			u, err := strconv.ParseUint(r.rowData[pos], 10, 8)
+			u, err := strconv.ParseUint(r.rowData[i], 10, 8)
 			if err != nil {
 				return errors.New("failed to parse uint8" + field.Name)
 			}
 			out = uint8(u)
 		case reflect.Uint16:
-			u, err := strconv.ParseUint(r.rowData[pos], 10, 16)
+			u, err := strconv.ParseUint(r.rowData[i], 10, 16)
 			if err != nil {
 				return errors.New("failed to parse uint16" + field.Name)
 			}
 			out = uint16(u)
 		case reflect.Uint32:
-			u, err := strconv.ParseUint(r.rowData[pos], 10, 32)
+			u, err := strconv.ParseUint(r.rowData[i], 10, 32)
 			if err != nil {
 				return errors.New("failed to parse uint32" + field.Name)
 			}
 			out = uint32(u)
 		case reflect.Uint64:
-			if out, err = strconv.ParseUint(r.rowData[pos], 10, 64); err != nil {
+			if out, err = strconv.ParseUint(r.rowData[i], 10, 64); err != nil {
 				return errors.New("failed to parse uint64" + field.Name)
 			}
 			//result float points 2/3/4/5/6/7?
 		case reflect.Float32:
-			f, err := strconv.ParseFloat(r.rowData[pos], fieldType.Bits())
+			f, err := strconv.ParseFloat(r.rowData[i], fieldType.Bits())
 			if err != nil {
 				return errors.New("failed to parse float32" + field.Name)
 			}
 			out = float32(f)
 		case reflect.Float64:
-			out, err = strconv.ParseFloat(r.rowData[pos], fieldType.Bits())
+			out, err = strconv.ParseFloat(r.rowData[i], fieldType.Bits())
 			if err != nil {
 				return errors.New("failed to parse float64" + field.Name)
 			}
 		case reflect.String:
-			out = r.rowData[pos]
+			out = r.rowData[i]
 		default:
 			return errors.New("this function doesn't support convertion" + "for the field '%s'" + field.Name)
 		}
@@ -307,8 +298,9 @@ func (f Frame) ListHeaders() []string {
 	return f.headers
 }
 
+// Reads the csv file in the file path given
 func ReadCsv(filePath string, perm fs.FileMode, header bool, bufSize ...int) (Frame, error) {
-	file, err := os.OpenFile(filePath, os.O_CREATE|os.O_RDONLY, perm)
+	file, err := os.Open(filePath)
 	if err != nil {
 		return Frame{}, err
 	}
@@ -325,6 +317,9 @@ func ReadCsv(filePath string, perm fs.FileMode, header bool, bufSize ...int) (Fr
 	records, err := rd.ReadAll()
 	if err != nil {
 		return Frame{}, err
+	}
+	if len(records) == 0 {
+		return Frame{}, nil
 	}
 
 	var f Frame
