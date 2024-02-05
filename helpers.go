@@ -17,27 +17,27 @@ func newCol(header string, records [][]string) []string {
 	return colData
 }
 
-func genCols(records [][]string) []colList {
+func genCols(records [][]string) []ColList {
 	if len(records) == 0 {
-		return []colList{}
+		return []ColList{}
 	}
-	var colist []colList
+	var colist []ColList
 	for _, header := range records[0] {
 		colData := newCol(header, records)
-		colist = append(colist, colList{header: header, colData: colData})
+		colist = append(colist, ColList{header: header, colData: colData})
 	}
 	return colist
 }
 
-func genRows(records [][]string, start int) []rowList {
+func genRows(records [][]string, start int) []RowList {
 	if len(records) == 0 {
-		return []rowList{}
+		return []RowList{}
 	}
-	var rowlist []rowList
+	var rowList []RowList
 	for _, record := range records[start:] {
-		rowlist = append(rowlist, rowList{rowData: record})
+		rowList = append(rowList, RowList{rowData: record})
 	}
-	return rowlist
+	return rowList
 }
 
 func extractItems(slice [][]string, n int) []string {
@@ -54,7 +54,7 @@ func extractItems(slice [][]string, n int) []string {
 	return result
 }
 
-func extractRowsString(rows []rowList) [][]string {
+func extractRowsString(rows []RowList) [][]string {
 	data := make([][]string, 0, len(rows))
 	for i := 0; i < len(rows); i++ {
 		rows := rows[i].String()

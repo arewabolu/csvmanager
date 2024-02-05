@@ -2,12 +2,12 @@ package csvmanager
 
 import "os"
 
-type colList struct {
+type ColList struct {
 	header  string
 	colData []string
 }
 
-type rowList struct {
+type RowList struct {
 	rowData []string
 }
 
@@ -31,8 +31,8 @@ type WriteFrame struct {
 
 type Frame struct {
 	headers []string
-	cols    []colList
-	rws     []rowList
+	cols    []ColList
+	rws     []RowList
 }
 
 type Types interface {

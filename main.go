@@ -50,7 +50,7 @@ func (w *WriteFrame) WriteCSV() error {
 }
 
 // Interface should be used to convert rows into  a defined struct
-func (r rowList) Interface(value interface{}) error {
+func (r RowList) Interface(value interface{}) error {
 	result := reflect.ValueOf(value).Elem() //Elem instead of interface{} to unbox the value/dereference the pointer
 	if result.Kind() != reflect.Struct {
 		return errors.New("need struct, value is not a struct")
@@ -179,7 +179,7 @@ func (r rowList) Interface(value interface{}) error {
 }
 
 // Bool returns an array of boolean values
-func (c colList) Bool() []bool {
+func (c ColList) Bool() []bool {
 	nwDataBool := make([]bool, 0, len(c.colData))
 	for _, v := range c.colData {
 		val, err := strconv.ParseBool(v)
@@ -192,7 +192,7 @@ func (c colList) Bool() []bool {
 }
 
 // Bool returns an array of boolean values
-func (r rowList) Bool() []bool {
+func (r RowList) Bool() []bool {
 	nwDataBool := make([]bool, 0, len(r.rowData))
 	for _, v := range r.rowData {
 		val, err := strconv.ParseBool(v)
@@ -204,20 +204,20 @@ func (r rowList) Bool() []bool {
 	return nwDataBool
 }
 
-func (f Frame) Col(colName string) colList {
+func (f Frame) Col(colName string) ColList {
 
 	for _, record := range f.cols {
 		if colName == record.header {
 			return record
 		}
 	}
-	return colList{}
+	return ColList{}
 }
 
 // returns column specified by the parameter
 // columns index alsways start from 0.
 // ColWithPosition is recommended to be used when header is false
-func (f Frame) ColWithPosition(colPos int) colList {
+func (f Frame) ColWithPosition(colPos int) ColList {
 	return f.cols[colPos]
 }
 
@@ -238,7 +238,7 @@ func (f Frame) CheckHeader(header string) (int, error) {
 }
 
 // FLoat always returns a float64 type
-func (c colList) Float() []float64 {
+func (c ColList) Float() []float64 {
 	nwDataFLoat := make([]float64, 0, len(c.colData))
 	for _, v := range c.colData {
 		val, err := strconv.ParseFloat(v, 64)
@@ -251,7 +251,7 @@ func (c colList) Float() []float64 {
 }
 
 // FLoat always returns a float64 type
-func (r rowList) Float() []float64 {
+func (r RowList) Float() []float64 {
 	nwDataFLoat := make([]float64, 0, len(r.rowData))
 	for _, v := range r.rowData {
 		val, err := strconv.ParseFloat(v, 64)
@@ -266,7 +266,7 @@ func (r rowList) Float() []float64 {
 // Int always returns an int type values
 //
 // Convert to any other type of integer
-func (c colList) Int() []int {
+func (c ColList) Int() []int {
 	nwDataInt := make([]int, 0, len(c.colData))
 	for _, v := range c.colData {
 		val, err := strconv.Atoi(v)
@@ -281,7 +281,7 @@ func (c colList) Int() []int {
 // Int always returns an int type values
 //
 // Convert to any other type of integer
-func (r rowList) Int() []int {
+func (r RowList) Int() []int {
 	nwDataInt := make([]int, 0, len(r.rowData))
 	for _, v := range r.rowData {
 		val, err := strconv.Atoi(v)
@@ -341,7 +341,7 @@ func ReadCsv(filePath string, header bool, bufSize ...int) (Frame, error) {
 
 /**/
 // Row returns only one row
-func (f Frame) Row(rowLine int) rowList {
+func (f Frame) Row(rowLine int) RowList {
 	if rowLine < 0 || rowLine > len(f.rws) {
 		panic("provided index out of bounds")
 	}
@@ -354,7 +354,7 @@ func (f Frame) Row(rowLine int) rowList {
 // else it returns all rows exluding the Header.
 //
 // Only 0,2, or 3 values can be specified.
-func (f Frame) Rows(Range ...int) []rowList {
+func (f Frame) Rows(Range ...int) []RowList {
 	if len(Range) == 0 {
 		return f.rws
 	}
@@ -371,7 +371,7 @@ func (f Frame) Rows(Range ...int) []rowList {
 		return f.rws[Range[0]:Range[1]]
 	}
 	if len(Range) == 3 {
-		Length := make([]rowList, 0)
+		Length := make([]RowList, 0)
 		for i := Range[0]; i <= Range[2]; i += Range[1] {
 			Length = append(Length, f.rws[i])
 		}
@@ -384,7 +384,7 @@ func (f Frame) Rows(Range ...int) []rowList {
 }
 
 // returns the number of rows
-func (r rowList) RowsLength() int {
+func (r RowList) RowsLength() int {
 	return len(r.rowData)
 }
 
@@ -394,14 +394,14 @@ func (f Frame) SizeofRows() int {
 }
 
 // String returns an array of string values for given column
-func (c colList) String() []string {
+func (c ColList) String() []string {
 	nwDataString := make([]string, 0, len(c.colData))
 	nwDataString = append(nwDataString, c.colData...)
 	return nwDataString
 }
 
 // String returns an array of string values for given row(s)
-func (r rowList) String() []string {
+func (r RowList) String() []string {
 	nwDataString := make([]string, 0, len(r.rowData))
 	nwDataString = append(nwDataString, r.rowData...)
 	return nwDataString
