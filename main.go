@@ -89,80 +89,80 @@ func (r RowList) Interface(value interface{}) error {
 		case reflect.Bool:
 			out, err = strconv.ParseBool(r.rowData[i])
 			if err != nil {
-				return errors.New("failed to parse bool" + field.Name)
+				return fmt.Errorf("failed to parse field %s, value:%v as bool", field.Name, r.rowData[i])
 			}
 		case reflect.Int:
 			val, err := strconv.ParseInt(r.rowData[i], 10, fieldType.Bits())
 			if err != nil {
-				return errors.New("failed to parse int" + field.Name)
+				return fmt.Errorf("failed to parse field %s, value:%v as int", field.Name, r.rowData[i])
 			}
 			out = int(val)
 		case reflect.Int8:
 			val, err := strconv.ParseInt(r.rowData[i], 10, 8)
 			if err != nil {
-				return errors.New("failed to parse int8" + field.Name)
+				return fmt.Errorf("failed to parse field %s, value:%v as int8", field.Name, r.rowData[i])
 			}
 			out = int8(val)
 		case reflect.Int16:
 			val, err := strconv.ParseInt(r.rowData[i], 10, 16)
 			if err != nil {
-				return errors.New("failed to parse int16" + field.Name)
+				return fmt.Errorf("failed to parse field %s, value:%v as int16", field.Name, r.rowData[i])
 			}
 			out = int16(val)
 		case reflect.Int32:
 			val, err := strconv.ParseInt(r.rowData[i], 10, 32)
 			if err != nil {
-				return errors.New("failed to parse int32" + field.Name)
+				return fmt.Errorf("failed to parse field %s, value:%v as int32", field.Name, r.rowData[i])
 			}
 			out = int32(val)
 		case reflect.Int64:
 			if out, err = strconv.ParseInt(r.rowData[i], 10, 64); err != nil {
-				return errors.New("failed to parse int64" + field.Name)
+				return fmt.Errorf("failed to parse field %s, value:%v as int64", field.Name, r.rowData[i])
 			}
 		case reflect.Uint:
 			u, err := strconv.ParseUint(r.rowData[i], 10, fieldType.Bits())
 			if err != nil {
-				return errors.New("failed to parse uint" + field.Name)
+				return fmt.Errorf("failed to parse field %s, value:%v as uint", field.Name, r.rowData[i])
 			}
 			out = uint(u)
 		case reflect.Uint8:
 			u, err := strconv.ParseUint(r.rowData[i], 10, 8)
 			if err != nil {
-				return errors.New("failed to parse uint8" + field.Name)
+				return fmt.Errorf("failed to parse field %s, value:%v as uint8", field.Name, r.rowData[i])
 			}
 			out = uint8(u)
 		case reflect.Uint16:
 			u, err := strconv.ParseUint(r.rowData[i], 10, 16)
 			if err != nil {
-				return errors.New("failed to parse uint16" + field.Name)
+				return fmt.Errorf("failed to parse field %s, value:%v as uint16", field.Name, r.rowData[i])
 			}
 			out = uint16(u)
 		case reflect.Uint32:
 			u, err := strconv.ParseUint(r.rowData[i], 10, 32)
 			if err != nil {
-				return errors.New("failed to parse uint32" + field.Name)
+				return fmt.Errorf("failed to parse field %s, value:%v as uint32", field.Name, r.rowData[i])
 			}
 			out = uint32(u)
 		case reflect.Uint64:
 			if out, err = strconv.ParseUint(r.rowData[i], 10, 64); err != nil {
-				return errors.New("failed to parse uint64" + field.Name)
+				return fmt.Errorf("failed to parse field %s, value:%v as uint64", field.Name, r.rowData[i])
 			}
 			//result float points 2/3/4/5/6/7?
 		case reflect.Float32:
 			f, err := strconv.ParseFloat(r.rowData[i], fieldType.Bits())
 			if err != nil {
-				return errors.New("failed to parse float32" + field.Name)
+				return fmt.Errorf("failed to parse field %s, value:%v as float32", field.Name, r.rowData[i])
 			}
 			out = float32(f)
 		case reflect.Float64:
 			out, err = strconv.ParseFloat(r.rowData[i], fieldType.Bits())
 			if err != nil {
-				return errors.New("failed to parse float64" + field.Name)
+				return fmt.Errorf("failed to parse field %s, value:%v as float64", field.Name, r.rowData[i])
 			}
 		case reflect.String:
 			out = r.rowData[i]
 		default:
-			return errors.New("this function doesn't support convertion" + "for the field '%s'" + field.Name)
+			return errors.New("this function doesn't support convertion for the field " + field.Name)
 		}
 
 		// if original kind is pointer, save as pointer value
@@ -212,6 +212,7 @@ func (f Frame) Col(colName string) ColList {
 		}
 	}
 	return ColList{}
+
 }
 
 // returns column specified by the parameter

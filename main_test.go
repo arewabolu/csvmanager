@@ -81,15 +81,15 @@ func TestReplaceRow(t *testing.T) {
 type RwStr struct {
 	One   int
 	Two   float64 `position:"5"` // testing tags
-	Three float64
+	Three bool
 }
 
 func TestInterface(t *testing.T) {
 
 	decRwStr := RwStr{}
 	rds, _ := ReadCsv("./BTCUSDT-1h-2022-11.csv", true)
-	err := rds.Row(2).Interface(&decRwStr)
-	t.Error(decRwStr)
+	err := rds.Row(3).Interface(&decRwStr)
+	t.Error(err)
 	if decRwStr.One == 1667268000000 {
 		t.Error(decRwStr)
 		t.Error(err)
